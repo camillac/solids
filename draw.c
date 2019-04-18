@@ -14,9 +14,7 @@
           screen s
           zbuffer zb
   Returns:
-
   Fills in polygon i by drawing consecutive horizontal (or vertical) lines.
-
   Color should be set differently for each polygon.
   ====================*/
 void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
@@ -190,7 +188,6 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
             double width
             double height
             double depth
-
   add the points for a rectagular prism whose
   upper-left-front corner is (x, y, z) with width,
   height and depth dimensions.
@@ -239,13 +236,10 @@ void add_box( struct matrix *polygons,
             double cz
             double r
             int step
-
   adds all the points for a sphere with center (cx, cy, cz)
   and radius r using step points per circle/semicircle.
-
   Since edges are drawn using 2 points, add each point twice,
   or add each point and then another point 1 pixel away.
-
   should call generate_sphere to create the necessary points
   ====================*/
 void add_sphere( struct matrix * edges,
@@ -376,10 +370,8 @@ struct matrix * generate_sphere(double cx, double cy, double cz,
             double r2
             double step
   Returns:
-
   adds all the points required for a torus with center (cx, cy, cz),
   circle radius r1 and torus radius r2 using step points per circle.
-
   should call generate_torus to create the necessary points
   ====================*/
 void add_torus( struct matrix * edges,
@@ -479,7 +471,6 @@ struct matrix * generate_torus( double cx, double cy, double cz,
             double cy
             double r
             double step
-
   Adds the circle at (cx, cy) with radius r to edges
   ====================*/
 void add_circle( struct matrix *edges,
@@ -514,7 +505,6 @@ Inputs:   struct matrix *edges
          double y3
          double step
          int type
-
 Adds the curve bounded by the 4 points passsed as parameters
 of type specified in type (see matrix.h for curve type constants)
 to the matrix edges
@@ -625,29 +615,35 @@ void draw_line(int x0, int y0, double z0,
 
 
   int x, y, d, A, B;
+  double z, dz;
   int dy_east, dy_northeast, dx_east, dx_northeast, d_east, d_northeast;
   int loop_start, loop_end;
 
   //swap points if going right -> left
   int xt, yt;
+  double zt;
   if (x0 > x1) {
     xt = x0;
     yt = y0;
+    zt = z0;
     x0 = x1;
     y0 = y1;
     z0 = z1;
     x1 = xt;
     y1 = yt;
+    z1 = zt;
   }
 
   x = x0;
   y = y0;
+  z = z0;
   A = 2 * (y1 - y0);
   B = -2 * (x1 - x0);
   int wide = 0;
   int tall = 0;
   //octants 1 and 8
   if ( abs(x1 - x0) >= abs(y1 - y0) ) { //octant 1/8
+    dz = (z1 - z0) / (x1 - x0);
     wide = 1;
     loop_start = x;
     loop_end = x1;
@@ -666,6 +662,7 @@ void draw_line(int x0, int y0, double z0,
     }
   }//end octant 1/8
   else { //octant 2/7
+    dz = (z1 - z0) / (abs) (y1 - y0);
     tall = 1;
     dx_east = 0;
     dx_northeast = 1;
@@ -689,7 +686,7 @@ void draw_line(int x0, int y0, double z0,
 
   while ( loop_start < loop_end ) {
 
-    plot( s, zb, c, x, y, 0);
+    plot( s, zb, c, x, y, z);
     if ( (wide && ((A > 0 && d > 0) ||
                    (A < 0 && d < 0)))
          ||
@@ -705,6 +702,7 @@ void draw_line(int x0, int y0, double z0,
       d+= d_east;
     }
     loop_start++;
+    z += dz;
   } //end drawing loop
-  plot( s, zb, c, x1, y1, 0 );
+  plot( s, zb, c, x1, y1, z1 );
 } //end draw_line
